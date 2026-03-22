@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import { humanizeEventDueDate } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function eventTemplate(event){
   const {dueDate, eventType, city, price, isFavourite, startTime, endTime, timeDifference} = event;
@@ -44,20 +44,26 @@ function eventTemplate(event){
             </li>`;
 }
 
-export default class createEvent{
-  constructor({event}) {
-    this.event = event;
+export default class createEvent extends AbstractView{
+  #event = null;
+  #handleEditClick = null;
 
+  constructor({event, onEditClick}){
+    super();
+    this.#event = event;
+
+    this.#handleEditClick = onEditClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
   }
 
-  getTemplate(){
-    return eventTemplate(this.event);
+  get template(){
+    return eventTemplate(this.#event);
   }
 
-  getElement(){
-    if (!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }

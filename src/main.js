@@ -1,7 +1,7 @@
 import createFilters from './view/filters-view.js';
 import TripPresenter from './presenter/presenter.js';
 import createTripMainInfo from './view/trip-main-info-view.js';
-import { render, RenderPosition } from './render.js';
+import { render, RenderPosition } from './framework/render.js';
 import PointsModel from './model/points-model.js';
 
 const tripEvents = document.querySelector('.trip-events');
