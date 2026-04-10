@@ -48,7 +48,7 @@ const destinationtPoints = [{
 },
 
 {
-  dueDate: '2019-01-21',
+  dueDate: '2026-08-21',
   eventType: getRandomArrayElement(types),
   city: getRandomArrayElement(cities),
   price: 10,
@@ -64,7 +64,7 @@ const destinationtPoints = [{
 },
 
 {
-  dueDate: '2019-01-21',
+  dueDate: '2027-01-21',
   eventType: getRandomArrayElement(types),
   city: getRandomArrayElement(cities),
   price: 70,

@@ -2,6 +2,12 @@ import dayjs from 'dayjs';
 
 const DATE_FORMAT = 'D MMMM';
 
+function getCurrentDate(){
+  const now = dayjs(new Date());
+
+  return dayjs(now);
+}
+
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
@@ -24,4 +30,4 @@ function getTimeDifference(start, end){
 
 }
 
-export {getRandomArrayElement, humanizeEventDueDate, getTimeDifference};
+export {getRandomArrayElement, humanizeEventDueDate, getTimeDifference, getCurrentDate};
