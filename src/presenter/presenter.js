@@ -1,9 +1,8 @@
 import createTripSort from '../view/trip-sort-view.js';
-import {render, RenderPosition, replace} from '../framework/render.js';
-import createEventEdit from '../view/event-edit-view.js';
-import createEvent from '../view/event-point-view.js';
+import {render, RenderPosition} from '../framework/render.js';
 import createSuggestionMessage from '../view/suggestion-window-create-event.js';
 import createEventsList from '../view/events-list-view.js';
+import PointPresenter from './point-presenter.js';
 
 const pageBodyPageMain = document.querySelector('.page-body__page-main');
 const pageBodyContainer = pageBodyPageMain.querySelector('.page-body__container');
@@ -12,6 +11,8 @@ export default class TripPresenter{
   #boardEvents = [];
   #pointsModel = null;
   #eventsContainer = null;
+  #pointPresenters = new Map();
+  #count = 0;
 
   constructor({eventsContainer, pointsModel}){
     this.#eventsContainer = eventsContainer;
@@ -44,40 +45,24 @@ export default class TripPresenter{
   }
 
   #renderTask(event){
-    const eventsList = document.querySelector('.trip-events__list');
-
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormToCard();
-        document.removeEventListener('keydown', escKeyDownHandler);
+    const makeFavorite = (button) => {
+      if (!event.isFavourite){
+        button.classList.add('event__favorite-btn--active');
+      } else {
+        button.classList.remove('event__favorite-btn--active');
       }
+      event.isFavourite = !event.isFavourite;
     };
 
-    const eventItem = new createEvent({
-      event,
-      onEditClick: () => {
-        replaceCardToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
-    });
+    const closeAllEdits = () =>{
+      this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    };
 
-    const eventEditItem = new createEventEdit({
-      event,
-      onFormSubmit: () => {
-        replaceFormToCard();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    });
+    const eventsList = document.querySelector('.trip-events__list');
 
-    function replaceCardToForm() {
-      replace(eventEditItem, eventItem);
-    }
-
-    function replaceFormToCard() {
-      replace(eventItem, eventEditItem);
-    }
-
-    render(eventItem, eventsList);
+    const pointPresenter = new PointPresenter(makeFavorite, closeAllEdits, eventsList);
+    pointPresenter.init(event);
+    this.#pointPresenters.set(this.#count++, pointPresenter);
   }
+
 }
