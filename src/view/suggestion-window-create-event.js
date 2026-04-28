@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function getTemplate(){
   let text;
@@ -28,7 +28,7 @@ function getTemplate(){
         </section>`;
 }
 
-export default class createSuggestionMessage extends AbstractView{
+export default class createSuggestionMessage extends AbstractStatefulView{
   get template(){
     return getTemplate();
   }

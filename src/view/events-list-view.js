@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function eventsListTemplate(){
   return `<ul class="trip-events__list">
@@ -6,7 +6,7 @@ function eventsListTemplate(){
         </ul>`;
 }
 
-export default class createEventsList extends AbstractView{
+export default class createEventsList extends AbstractStatefulView{
   get template(){
     return eventsListTemplate();
   }

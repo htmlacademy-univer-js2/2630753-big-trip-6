@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function tripMainInfoTemplate(){
   return `          <section class="trip-main__trip-info  trip-info">
@@ -14,7 +14,7 @@ function tripMainInfoTemplate(){
           </section>`;
 }
 
-export default class createTripMainInfo extends AbstractView{
+export default class createTripMainInfo extends AbstractStatefulView{
   get template(){
     return tripMainInfoTemplate();
   }

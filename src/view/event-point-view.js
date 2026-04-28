@@ -1,5 +1,5 @@
 import { humanizeEventDueDate } from '../utils.js';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function eventTemplate(event){
   const {dueDate, eventType, city, price, isFavourite, startTime, endTime, timeDifference} = event;
@@ -44,7 +44,7 @@ function eventTemplate(event){
             </li>`;
 }
 
-export default class createEvent extends AbstractView{
+export default class createEvent extends AbstractStatefulView{
   #event = null;
   #handleEditClick = null;
 

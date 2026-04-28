@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function filtersItemTemplate(filter, isChecked){
   const {type} = filter;
@@ -26,7 +26,7 @@ function filtersTemplate(filterItems){
           </form>`;
 }
 
-export default class createFilters extends AbstractView{
+export default class createFilters extends AbstractStatefulView{
   #filter = null;
 
   constructor({filter}){

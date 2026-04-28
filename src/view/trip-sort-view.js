@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function tripSortTemplate(){
   return `          <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -29,7 +29,7 @@ function tripSortTemplate(){
           </form>`;
 }
 
-export default class createTripSort extends AbstractView{
+export default class createTripSort extends AbstractStatefulView{
   get template(){
     return tripSortTemplate();
   }
