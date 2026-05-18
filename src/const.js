@@ -27,7 +27,15 @@ const SortType = {
 const UserActionType = {
   ADD: 'ADD',
   DELETE: 'DELETE',
-  UPDATE: 'UPDATE'
+  UPDATE: 'UPDATE',
+  INIT: 'INIT'
 };
 
-export {types, cities, UpdateType, SortType, UserActionType};
+const MethodType = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
+
+export {types, cities, UpdateType, SortType, UserActionType, MethodType};
