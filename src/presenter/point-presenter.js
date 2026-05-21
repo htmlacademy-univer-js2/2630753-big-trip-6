@@ -12,6 +12,8 @@ export default class PointPresenter {
   #closeAllEditsHandler = null;
   #mode = Mode.DEFAULT;
   #event = null;
+  #offers = null;
+  #destinations = null;
   #eventItem = null;
   #eventEditItem = null;
   #eventsList = null;
@@ -23,14 +25,18 @@ export default class PointPresenter {
     this.#eventsList = eventsList;
   }
 
-  init(event){
+  init(event, offers, destinations){
     this.#event = event;
+    this.#offers = offers;
+    this.#destinations = destinations;
 
     const previosEventItem = this.#eventItem;
     const previosEventEditItem = this.#eventEditItem;
 
     this.#eventItem = new createEvent({
       event: this.#event,
+      offers: this.#offers,
+      destinations: this.#destinations,
       onEditClick: () => {
         this.#replaceCardToForm();
       }
@@ -38,6 +44,8 @@ export default class PointPresenter {
 
     this.#eventEditItem = new createEventEdit({
       event: this.#event,
+      offers: this.#offers,
+      destinations: this.#destinations,
       onFormSubmit: this.#onSubmitButtonClickHandler,
       onDeleteClick: this.#handleDeleteClick,
       onCloseAction: this.#onFormCloseHandler

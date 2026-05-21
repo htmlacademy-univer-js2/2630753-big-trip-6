@@ -1,52 +1,35 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
-import { getTimeDifference } from '../utils';
-import { offersType } from '../mock/offers';
 import he from 'he';
+import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
-function offersTemplate(offers){
-  const {offersForType} = offers;
+function photosTemplate(destinationData){
+  return destinationData.pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}">`).join('');
+}
 
-  return offersForType.map((offer, idx) => `
+function offersTemplate(offerElements, event){
+  return offerElements.map((offer, idx) => `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox visually-hidden" id="event-offer-${idx}" type="checkbox" name="event-offer-${idx}">
+      <input class="event__offer-checkbox visually-hidden" id="event-offer-${idx}" type="checkbox" name="event-offer-${idx}" ${event.offers.includes(offer.id) ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-${idx}">
-        <span class="event__offer-title">${offer.offerTitle}</span>
+        <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
       </label>
     </div>`).join('');
 }
 
-function newPointTemplate(event){
-  const {eventType, city, price, offers, startTime, endTime} = event;
-  let description;
-  let photoList;
+function newPointTemplate(event, offersArr, destinationsArr){
+  const {type, basePrice, dateFrom, dateTo} = event;
 
-  if (city === 'Chamonix'){
-    description = `Chamonix-Mont-Blanc 
-    (usually shortened to Chamonix) is a resort area near the junction of France, 
-    Switzerland and Italy. At the base of Mont Blanc, the highest summit in the Alps, it's renowned for its skiing.`;
+  const offerElements = offersArr[type].filter((offer) => event.offers.some((e) => e === offer.id));
+  const destinationData = destinationsArr.find((d) => d.id === event.destination);
 
-    photoList = `           <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-                        <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-                        <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-                        <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-                        <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">`;
-  } else if (city === 'Geneva'){
-    description = `Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). 
-    Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.`;
+  const startTime = dayjs(dateFrom).format('HH:mm');
+  const endTime = dayjs(dateTo).format('HH:mm');
 
-    photoList = `<img class="event__photo" src="img/photos/Gen1.jpg" alt="Event photo">
-                 <img class="event__photo" src="img/photos/Gen2.jpg" alt="Event photo">`;
-  } else if (city === 'Amsterdam'){
-    description = 'Amsterdam... yeah';
-
-    photoList = `<img class="event__photo" src="img/photos/Ams1.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/Ams2.jpg" alt="Event photo">`;
-  } else {
-    description = 'Town is not stated, please, select one of available to see more information about it';
-    photoList = '';
-  }
+  const startDate = dayjs(dateFrom).format('DD/MM/YY');
+  const endDate = dayjs(dateTo).format('DD/MM/YY');
 
   return `
     <form class="event event--edit" action="#" method="post">
@@ -54,7 +37,7 @@ function newPointTemplate(event){
                   <div class="event__type-wrapper">
                     <label class="event__type  event__type-btn" for="event-type-toggle-1">
                       <span class="visually-hidden">Choose event type</span>
-                      <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType}.png" alt="Event type icon">
+                      <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
                     </label>
                     <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -63,47 +46,47 @@ function newPointTemplate(event){
                         <legend class="visually-hidden">Event type</legend>
 
                         <div class="event__type-item">
-                          <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi"  ${eventType === 'taxi' ? 'checked' : ''}>
+                          <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi"  ${type === 'taxi' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${eventType === 'bus' ? 'checked' : ''}>
+                          <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${type === 'bus' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${eventType === 'train' ? 'checked' : ''}>
+                          <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${type === 'train' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${eventType === 'ship' ? 'checked' : ''}>
+                          <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${type === 'ship' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${eventType === 'drive' ? 'checked' : ''}>
+                          <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${type === 'drive' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" ${eventType === 'flight' ? 'checked' : ''}>
+                          <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" ${type === 'flight' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${eventType === 'check-in' ? 'checked' : ''}>
+                          <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${type === 'check-in' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${eventType === 'sightseeing' ? 'checked' : ''}>
+                          <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${type === 'sightseeing' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
                         </div>
 
                         <div class="event__type-item">
-                          <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${eventType === 'restaurant' ? 'checked' : ''}>
+                          <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${type === 'restaurant' ? 'checked' : ''}>
                           <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
                         </div>
                       </fieldset>
@@ -112,9 +95,9 @@ function newPointTemplate(event){
 
                   <div class="event__field-group  event__field-group--destination">
                     <label class="event__label  event__type-output" for="event-destination-1">
-                      ${eventType}
+                      ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(`${city}`)}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destinationData ? `${destinationData.name}` : '')}" list="destination-list-1">
                     <datalist id="destination-list-1">
                       <option value="Amsterdam"></option>
                       <option value="Geneva"></option>
@@ -124,10 +107,10 @@ function newPointTemplate(event){
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="19/03/19 ${startTime}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate} ${startTime}">
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="19/03/19 ${endTime}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate} ${endTime}">
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -135,7 +118,7 @@ function newPointTemplate(event){
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
+                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -146,17 +129,17 @@ function newPointTemplate(event){
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                     <div class="event__available-offers">
-                      ${offersTemplate(offers)}
+                      ${offerElements ? offersTemplate(offersArr[type], event) : ''}
                     </div>
                   </section>
 
                   <section class="event__section  event__section--destination">
                     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                    <p class="event__destination-description">${description}</p>
+                    <p class="event__destination-description">${destinationData ? destinationData.description : ''}</p>
 
                     <div class="event__photos-container">
                       <div class="event__photos-tape">
-                        ${photoList}
+                        ${destinationData ? photosTemplate(destinationData) : ''}
                       </div>
                     </div>
                   </section>
@@ -169,31 +152,23 @@ function newPointTemplate(event){
 export default class createNewEvent extends AbstractStatefulView{
   #onFormSubmit = null;
   #onDeleteClick = null;
+  #offers = null;
+  #destinations = null;
 
-  constructor({onDeleteClick, onFormSubmit}){
+  constructor({offers, destinations, onDeleteClick, onFormSubmit}){
     super();
+    this.#offers = offers;
+    this.#destinations = destinations;
 
     this._setState({
-      dueDate: '2027-01-21',
-      eventType: 'flight',
-      city: 'Amsterdam',
-      price: 20,
-      startTime: '00:00',
-      endTime: '00:00',
-      timeDifference: getTimeDifference('00:00', '00:00'),
-      offers:   {
-        eventType: 'flight',
-        offersForType: [
-          {
-            offerTitle: 'Flight 1',
-            price: '340'
-          },
-          {
-            offerTitle: 'Flight 2',
-            price: '140'
-          }
-        ]
-      }
+      id: nanoid(),
+      type: 'flight',
+      destination: [],
+      basePrice: 0,
+      dateFrom: '2026-01-01T02:15:05.620Z',
+      dateTo: '2026-01-01T02:15:05.620Z',
+      isFavorite: false,
+      offers: []
     });
 
     this.#onFormSubmit = onFormSubmit;
@@ -232,8 +207,9 @@ export default class createNewEvent extends AbstractStatefulView{
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
     const destinationTarget = evt.target.value;
+    const newDestination = this.#destinations.find((d) => d.name === destinationTarget);
     this.updateElement({
-      city: destinationTarget
+      destination: newDestination.id
     });
   };
 
@@ -241,7 +217,7 @@ export default class createNewEvent extends AbstractStatefulView{
     evt.preventDefault();
     const newPrice = evt.target.value;
     this.updateElement({
-      price: newPrice
+      basePrice: Number(newPrice)
     });
   };
 
@@ -249,27 +225,28 @@ export default class createNewEvent extends AbstractStatefulView{
     evt.preventDefault();
     const typeTarget = evt.target.value;
     this.updateElement({
-      eventType: typeTarget,
-      offers: offersType.find((offer) => offer.eventType === typeTarget)
+      type: typeTarget,
+      offers: []
+      // offers: this.#offers[typeTarget].map((offer) => offer.id)
     });
   };
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    const normalizedPrice = Number(this._state.price);
+    const normalizedPrice = Number(this._state.basePrice);
     this.#onFormSubmit({
       ...this._state,
-      price: Number.isFinite(normalizedPrice) && normalizedPrice > 0 ? Math.trunc(normalizedPrice) : 0
+      basePrice: Number.isFinite(normalizedPrice) && normalizedPrice > 0 ? Math.trunc(normalizedPrice) : 0
     });
   };
 
   get template(){
-    return newPointTemplate(this._state);
+    return newPointTemplate(this._state, this.#offers, this.#destinations);
   }
 
   static parseEventToState(event) {
     return {...event,
-      isDueDate: event.dueDate !== null,
+      isDueDate: event.dateFrom !== null,
     };
   }
 
@@ -277,7 +254,7 @@ export default class createNewEvent extends AbstractStatefulView{
     const event = {...state};
 
     if (!event.isDueDate) {
-      event.dueDate = null;
+      event.dateFrom = null;
     }
 
     delete event.isDueDate;

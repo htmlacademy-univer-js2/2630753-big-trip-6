@@ -7,11 +7,15 @@ export default class NewPointPresenter {
   #eventsListContainer = null;
   #handleDataChange = null;
   #handleDestroy = null;
+  #offers = null;
+  #destinations = null;
 
   #pointEditItem = null;
 
-  constructor(eventsListContainer, onDataChange, onDestroy) {
+  constructor(eventsListContainer, offers, destinations, onDataChange, onDestroy) {
     this.#eventsListContainer = eventsListContainer;
+    this.#offers = offers;
+    this.#destinations = destinations;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
   }
@@ -22,6 +26,8 @@ export default class NewPointPresenter {
     }
 
     this.#pointEditItem = new createNewEvent({
+      offers: this.#offers,
+      destinations: this.#destinations,
       onFormSubmit: this.#handleFormSubmit,
       onDeleteClick: this.#handleDeleteClick
     });

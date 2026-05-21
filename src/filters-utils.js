@@ -3,17 +3,17 @@ import { getCurrentDate } from './utils';
 
 
 function isFuturePoint(point){
-  const date = dayjs(point.dueDate);
+  const date = dayjs(point.dateFrom);
   return dayjs(date).isAfter(getCurrentDate());
 }
 
 function isPastPoint(point){
-  const date = dayjs(point.dueDate);
+  const date = dayjs(point.dateFrom);
   return dayjs(date).isBefore(getCurrentDate());
 }
 
 function isPresentPoint(point){
-  const date = dayjs(point.dueDate);
+  const date = dayjs(point.dateFrom);
   return dayjs(date).isSame(getCurrentDate());
 }
 

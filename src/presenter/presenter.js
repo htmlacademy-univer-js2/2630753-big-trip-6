@@ -2,6 +2,7 @@ import createTripSort from '../view/trip-sort-view.js';
 import {remove, render, RenderPosition} from '../framework/render.js';
 import createSuggestionMessage from '../view/suggestion-window-create-event.js';
 import createEventsList from '../view/events-list-view.js';
+import createLoadMessage from '../view/data-loading-view.js';
 import PointPresenter from './point-presenter.js';
 import { filter, filtersTypes } from '../filters-const.js';
 import { UpdateType, SortType, UserActionType } from '../const.js';
@@ -9,8 +10,6 @@ import { sortEventDate, sortEventPrice, sortEventTime } from '../sorting-utils.j
 import NewPointPresenter from './new-point-presenter.js';
 import { nanoid } from 'nanoid';
 
-// const pageBodyPageMain = document.querySelector('.page-body__page-main');
-// const pageBodyContainer = pageBodyPageMain.querySelector('.page-body__container');
 const newEventButton = document.querySelector('.trip-main__event-add-btn');
 
 export default class TripPresenter{
@@ -25,6 +24,7 @@ export default class TripPresenter{
   #suggestionMessage = new createSuggestionMessage();
   #eventsList = new createEventsList();
   #newEvent = null;
+  #loadScreen = null;
 
   constructor(eventsContainer, pointsModel, filterModel){
     this.#eventsContainer = eventsContainer;
@@ -53,11 +53,20 @@ export default class TripPresenter{
     return filteredPoints;
   }
 
+  get destinations() {
+    return this.#pointsModel.destinations;
+  }
+
+  get offers() {
+    return this.#pointsModel.offers;
+  }
+
   init(){
+    this.#renderLoad();
     this.#renderBoard();
   }
 
-  #renderEvent(event){
+  #renderEvent(event, offers, destinations){
     const closeAllEdits = () =>{
       this.#pointPresenters.forEach((presenter) => presenter.resetView());
     };
@@ -65,7 +74,7 @@ export default class TripPresenter{
     const eventsList = document.querySelector('.trip-events__list');
 
     const pointPresenter = new PointPresenter(closeAllEdits, this.#handleViewAction, eventsList);
-    pointPresenter.init(event);
+    pointPresenter.init(event, offers, destinations);
     this.#pointPresenters.set(nanoid(), pointPresenter);
   }
 
@@ -78,7 +87,7 @@ export default class TripPresenter{
     this.#currentSortType = SortType.DATE;
 
     const eventsList = document.querySelector('.trip-events__list');
-    this.#newEvent = new NewPointPresenter(eventsList, this.#handleViewAction, this.#switchNewEnableButton);
+    this.#newEvent = new NewPointPresenter(eventsList, this.offers, this.destinations, this.#handleViewAction, this.#switchNewEnableButton);
 
     this.#newEvent.init();
     newEventButton.disabled = true;
@@ -105,10 +114,21 @@ export default class TripPresenter{
         this.#clearBoard({ resetSortType: true });
         this.#renderBoard();
         break;
+      case UpdateType.INIT: {
+        if (this.#loadScreen) {
+          remove(this.#loadScreen);
+        }
+
+        this.#renderLoad();
+        this.#clearBoard();
+        this.#renderBoard();
+
+        break;
+      }
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) =>{
+  #handleViewAction = async (actionType, updateType, update) =>{
     switch (actionType){
       case UserActionType.ADD:
         this.#pointsModel.addPoint(updateType, update);
@@ -131,8 +151,12 @@ export default class TripPresenter{
     this.#renderBoard();
   };
 
+  #renderLoad() {
+    this.#loadScreen = new createLoadMessage();
+    render(this.#loadScreen, this.#eventsContainer, RenderPosition.AFTERBEGIN);
+  }
+
   #renderBoard = () => {
-    this.#eventsContainer.innerHTML = '';
     const pointsArr = this.points;
 
     const filtersArray = document.querySelectorAll('.trip-filters__filter-input');
@@ -148,13 +172,14 @@ export default class TripPresenter{
       });
     } else{
       this.#renderSort();
+      remove(this.#loadScreen);
       render(this.#eventsList, this.#eventsContainer);
     }
 
     newEventButton.addEventListener('click', this.#renderNewEvent);
 
     for (let i = 0; i < pointsArr.length; i++){
-      this.#renderEvent(pointsArr[i]);
+      this.#renderEvent(pointsArr[i], this.offers, this.destinations);
     }
   };
 
@@ -163,6 +188,7 @@ export default class TripPresenter{
       this.#currentSortType = SortType.DATE;
     }
 
+    remove(this.#loadScreen);
     remove(this.#tripSort);
     remove(this.#suggestionMessage);
     remove(this.#eventsList);
