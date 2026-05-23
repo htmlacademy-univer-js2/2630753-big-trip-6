@@ -39,7 +39,8 @@ export default class PointPresenter {
       destinations: this.#destinations,
       onEditClick: () => {
         this.#replaceCardToForm();
-      }
+      },
+      handleDataChange: this.#dataChangeHandler
     });
 
     this.#eventEditItem = new createEventEdit({
@@ -122,4 +123,39 @@ export default class PointPresenter {
     remove(this.#eventItem);
     remove(this.#eventEditItem);
   };
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditItem.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditItem.updateElement({
+        isDisabled: true,
+        isDeleting: true
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#eventItem.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#eventEditItem.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this.#eventEditItem.shake(resetFormState);
+  }
 }

@@ -2,6 +2,7 @@ import { humanizeEventDueDate } from '../utils.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
 import he from 'he';
+import { UserActionType, UpdateType } from '../const.js';
 
 function offersTemplate(offerElements){
 
@@ -66,14 +67,16 @@ export default class createEvent extends AbstractStatefulView{
   #offers = null;
   #destinations = null;
   #handleEditClick = null;
+  #handleDataChange = null;
 
-  constructor({event, offers, destinations, onEditClick}){
+  constructor({event, offers, destinations, onEditClick, handleDataChange}){
     super();
     this.#event = event;
     this.#offers = offers;
     this.#destinations = destinations;
 
     this.#handleEditClick = onEditClick;
+    this.#handleDataChange = handleDataChange;
 
     this.element.querySelector('.event__favorite-btn')
       .addEventListener('click', this.#onChangeFavourite);
@@ -92,12 +95,11 @@ export default class createEvent extends AbstractStatefulView{
     return eventTemplate(this.#event, this.#offers, this.#destinations);
   }
 
-  #onChangeFavourite = (evt) =>{
-    evt.preventDefault();
-    this.#event.isFavorite = !this.#event.isFavorite;
-    this.updateElement({
-      isFavorite: !this.#event.isFavorite
-    });
+  #onChangeFavourite = () =>{
+    this.#handleDataChange(
+      UserActionType.UPDATE,
+      UpdateType.MINOR,
+      {...this.#event, isFavorite: !this.#event.isFavorite});
   };
 
   #editClickHandler = (evt) => {

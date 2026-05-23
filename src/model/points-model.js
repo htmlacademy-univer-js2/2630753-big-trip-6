@@ -6,6 +6,7 @@ export default class PointsModel extends Observable {
   #offers = [];
   #destinations = [];
   #eventsApi = null;
+  #isLoadingError = false;
 
   constructor({eventsApi}){
     super();
@@ -24,6 +25,10 @@ export default class PointsModel extends Observable {
     return this.#offers;
   }
 
+  get isLoadingError(){
+    return this.#isLoadingError;
+  }
+
   async init() {
     try {
       const points = await this.#eventsApi.points;
@@ -33,10 +38,12 @@ export default class PointsModel extends Observable {
       this.#points = points.map(this.#adaptToClient);
       this.#offers = this.#adaptOffersToClient(offers);
       this.#destinations = destinations;
+      this.#isLoadingError = false;
     } catch (err) {
       this.#points = [];
       this.#offers = [];
       this.#destinations = [];
+      this.#isLoadingError = true;
     }
 
     this._notify(UpdateType.INIT);
@@ -67,9 +74,15 @@ export default class PointsModel extends Observable {
   }
 
   async addPoint(updateType, update){
-    this.#points = [update, ...this.#points];
+    try{
+      const response = await this.#eventsApi.addPoint(update);
+      const newPoint = this.#adaptToClient(response);
+      this.#points = [newPoint, ...this.#points];
 
-    this._notify(updateType, update);
+      this._notify(updateType, newPoint);
+    } catch(err) {
+      throw new Error('Failed adding point');
+    }
   }
 
   async deletePoint(updateType, update){
@@ -79,9 +92,13 @@ export default class PointsModel extends Observable {
       throw new Error('Can\'t delete unexisting event');
     }
 
-    this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
-
-    this._notify(updateType);
+    try{
+      await this.#eventsApi.deletePoint(update);
+      this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
+      this._notify(updateType);
+    } catch(err){
+      throw new Error('Failed deleting point');
+    }
   }
 
   #adaptToClient(point) {

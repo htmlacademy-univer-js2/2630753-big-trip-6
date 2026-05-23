@@ -55,7 +55,6 @@ export default class NewPointPresenter {
       UpdateType.MINOR,
       {id: nanoid(), ...point},
     );
-    this.destroy();
   };
 
   #handleDeleteClick = () => {
@@ -68,4 +67,23 @@ export default class NewPointPresenter {
       this.destroy();
     }
   };
+
+  setSaving() {
+    this.#pointEditItem.updateElement({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointEditItem.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this.#pointEditItem.shake(resetFormState);
+  }
 }

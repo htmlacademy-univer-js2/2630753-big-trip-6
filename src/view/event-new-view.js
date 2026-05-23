@@ -20,7 +20,7 @@ function offersTemplate(offerElements, event){
 }
 
 function newPointTemplate(event, offersArr, destinationsArr){
-  const {type, basePrice, dateFrom, dateTo} = event;
+  const {type, basePrice, dateFrom, dateTo, isDeleting, isSaving, isDisabled} = event;
 
   const offerElements = offersArr[type].filter((offer) => event.offers.some((e) => e === offer.id));
   const destinationData = destinationsArr.find((d) => d.id === event.destination);
@@ -37,7 +37,7 @@ function newPointTemplate(event, offersArr, destinationsArr){
                   <div class="event__type-wrapper">
                     <label class="event__type  event__type-btn" for="event-type-toggle-1">
                       <span class="visually-hidden">Choose event type</span>
-                      <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+                      <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon" ${isDisabled ? 'disabled' : ''}>
                     </label>
                     <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -97,7 +97,7 @@ function newPointTemplate(event, offersArr, destinationsArr){
                     <label class="event__label  event__type-output" for="event-destination-1">
                       ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destinationData ? `${destinationData.name}` : '')}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destinationData ? `${destinationData.name}` : '')}" list="destination-list-1" required>
                     <datalist id="destination-list-1">
                       <option value="Amsterdam"></option>
                       <option value="Geneva"></option>
@@ -107,10 +107,10 @@ function newPointTemplate(event, offersArr, destinationsArr){
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate} ${startTime}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate} ${startTime}" required>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate} ${endTime}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate} ${endTime}" required>
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -118,11 +118,11 @@ function newPointTemplate(event, offersArr, destinationsArr){
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
+                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}" required>
                   </div>
 
-                  <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Cancel</button>
+                  <button class="event__save-btn  btn  btn--blue" type="submit">${isSaving ? 'Saving...' : 'Save'}</button>
+                  <button class="event__reset-btn" type="reset" ${isDeleting ? 'disabled' : ''}>Cancel</button>
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
@@ -164,7 +164,7 @@ export default class createNewEvent extends AbstractStatefulView{
       id: nanoid(),
       type: 'flight',
       destination: [],
-      basePrice: 0,
+      basePrice: 1,
       dateFrom: '2026-01-01T02:15:05.620Z',
       dateTo: '2026-01-01T02:15:05.620Z',
       isFavorite: false,
@@ -227,7 +227,6 @@ export default class createNewEvent extends AbstractStatefulView{
     this.updateElement({
       type: typeTarget,
       offers: []
-      // offers: this.#offers[typeTarget].map((offer) => offer.id)
     });
   };
 

@@ -9,7 +9,6 @@ import EventsApi from './api/events-api.js';
 const tripEvents = document.querySelector('.trip-events');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');
 const tripMain = document.querySelector('.trip-main');
-// const newEventButton = document.querySelector('.trip-main__event-add-btn');
 
 const END_POINT = 'https://24.objects.htmlacademy.pro/big-trip';
 const AUTHORIZATION = 'Basic 7r4gr876wpqt';
@@ -20,11 +19,6 @@ const filterModel = new FilterModel();
 
 const tripPresenter = new TripPresenter(tripEvents, pointsModel, filterModel);
 const filterPresenter = new FilterPresenter({filterContainer: tripControlsFilters, filterModel, pointsModel});
-
-// function handleNewPointButtonClick(){
-//   tripPresenter.createNewPoint();
-//   newEventButton.element.disabled = true;
-// }
 
 render(new createTripMainInfo(), tripMain, RenderPosition.AFTERBEGIN);
 
