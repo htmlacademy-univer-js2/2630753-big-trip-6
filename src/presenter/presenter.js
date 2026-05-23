@@ -3,12 +3,13 @@ import {remove, render, RenderPosition} from '../framework/render.js';
 import createSuggestionMessage from '../view/suggestion-window-create-event.js';
 import createEventsList from '../view/events-list-view.js';
 import createLoadMessage from '../view/data-loading-view.js';
+import createLoadErrorMessage from '../view/data-error-loading-view.js';
 import PointPresenter from './point-presenter.js';
 import { filter, filtersTypes } from '../filters-const.js';
 import { UpdateType, SortType, UserActionType } from '../const.js';
 import { sortEventDate, sortEventPrice, sortEventTime } from '../sorting-utils.js';
 import NewPointPresenter from './new-point-presenter.js';
-import { nanoid } from 'nanoid';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const newEventButton = document.querySelector('.trip-main__event-add-btn');
 
@@ -25,11 +26,18 @@ export default class TripPresenter{
   #eventsList = new createEventsList();
   #newEvent = null;
   #loadScreen = null;
+  #loadErrorScreen = null;
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: 500,
+    upperLimit: 1500
+  });
 
   constructor(eventsContainer, pointsModel, filterModel){
     this.#eventsContainer = eventsContainer;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+    newEventButton.disabled = true;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -75,7 +83,7 @@ export default class TripPresenter{
 
     const pointPresenter = new PointPresenter(closeAllEdits, this.#handleViewAction, eventsList);
     pointPresenter.init(event, offers, destinations);
-    this.#pointPresenters.set(nanoid(), pointPresenter);
+    this.#pointPresenters.set(event.id, pointPresenter);
   }
 
   #switchNewEnableButton = () => {
@@ -88,6 +96,7 @@ export default class TripPresenter{
 
     const eventsList = document.querySelector('.trip-events__list');
     this.#newEvent = new NewPointPresenter(eventsList, this.offers, this.destinations, this.#handleViewAction, this.#switchNewEnableButton);
+
 
     this.#newEvent.init();
     newEventButton.disabled = true;
@@ -104,6 +113,7 @@ export default class TripPresenter{
   #handleModelEvent = (updateType, data) => {
     switch(updateType){
       case UpdateType.PATCH:
+        remove(this.#eventsList);
         this.#pointPresenters.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
@@ -111,6 +121,7 @@ export default class TripPresenter{
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
+        remove(this.#eventsList);
         this.#clearBoard({ resetSortType: true });
         this.#renderBoard();
         break;
@@ -119,8 +130,20 @@ export default class TripPresenter{
           remove(this.#loadScreen);
         }
 
-        this.#renderLoad();
+        if (this.#loadErrorScreen) {
+          remove(this.#loadErrorScreen);
+        }
+
+        if (this.#pointsModel.isLoadingError) {
+          newEventButton.disabled = true;
+          this.#renderLoadError();
+          return;
+        }
+
+        newEventButton.disabled = false;
+
         this.#clearBoard();
+        this.#renderLoad();
         this.#renderBoard();
 
         break;
@@ -129,17 +152,35 @@ export default class TripPresenter{
   };
 
   #handleViewAction = async (actionType, updateType, update) =>{
+    this.#uiBlocker.block();
     switch (actionType){
       case UserActionType.ADD:
-        this.#pointsModel.addPoint(updateType, update);
+        this.#newEvent.setSaving();
+        try {
+          await this.#pointsModel.addPoint(updateType, update);
+        } catch(err) {
+          this.#newEvent.setAborting();
+        }
         break;
       case UserActionType.DELETE:
-        this.#pointsModel.deletePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setDeleting();
+        try {
+          await this.#pointsModel.deletePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
       case UserActionType.UPDATE:
-        this.#pointsModel.updatePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setSaving();
+        try {
+          await this.#pointsModel.updatePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -147,6 +188,7 @@ export default class TripPresenter{
       return;
     }
     this.#currentSortType = sortType;
+    remove(this.#eventsList);
     this.#clearBoard();
     this.#renderBoard();
   };
@@ -156,17 +198,25 @@ export default class TripPresenter{
     render(this.#loadScreen, this.#eventsContainer, RenderPosition.AFTERBEGIN);
   }
 
+  #renderLoadError(){
+    this.#loadErrorScreen = new createLoadErrorMessage();
+    render(this.#loadErrorScreen, this.#eventsContainer, RenderPosition.AFTERBEGIN);
+  }
+
   #renderBoard = () => {
     const pointsArr = this.points;
 
     const filtersArray = document.querySelectorAll('.trip-filters__filter-input');
+    const loadScreen = document.querySelector('.trip-events__msg');
 
     if (pointsArr.length === 0){
-      render(this.#suggestionMessage, this.#eventsContainer);
+      if (!loadScreen){
+        render(this.#suggestionMessage, this.#eventsContainer);
+      }
 
       filtersArray.forEach((filterItem) => {
         filterItem.addEventListener('click', () => {
-          this.#eventsContainer.innerHTML = '';
+          this.#clearBoard();
           render(this.#suggestionMessage, this.#eventsContainer, RenderPosition.AFTERBEGIN);
         });
       });
@@ -191,7 +241,6 @@ export default class TripPresenter{
     remove(this.#loadScreen);
     remove(this.#tripSort);
     remove(this.#suggestionMessage);
-    remove(this.#eventsList);
 
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
