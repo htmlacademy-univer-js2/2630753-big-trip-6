@@ -1,11 +1,11 @@
-import createTripSort from '../view/trip-sort-view.js';
+import CreateTripSort from '../view/trip-sort-view.js';
 import {remove, render, RenderPosition} from '../framework/render.js';
-import createSuggestionMessage from '../view/suggestion-window-create-event.js';
-import createEventsList from '../view/events-list-view.js';
-import createLoadMessage from '../view/data-loading-view.js';
-import createLoadErrorMessage from '../view/data-error-loading-view.js';
+import CreateSuggestionMessage from '../view/suggestion-window-create-event.js';
+import CreateEventsList from '../view/events-list-view.js';
+import CreateLoadMessage from '../view/data-loading-view.js';
+import CreateLoadErrorMessage from '../view/data-error-loading-view.js';
 import PointPresenter from './point-presenter.js';
-import { filter, filtersTypes } from '../filters-const.js';
+import { filter, FiltersTypes } from '../filters-const.js';
 import { UpdateType, SortType, UserActionType } from '../const.js';
 import { sortEventDate, sortEventPrice, sortEventTime } from '../sorting-utils.js';
 import NewPointPresenter from './new-point-presenter.js';
@@ -16,14 +16,14 @@ const newEventButton = document.querySelector('.trip-main__event-add-btn');
 export default class TripPresenter{
   #pointsModel = null;
   #filterModel = null;
-  #filterType = filtersTypes.EVERYTHING;
+  #filterType = FiltersTypes.EVERYTHING;
   #currentSortType = SortType.DATE;
   #eventsContainer = null;
   #pointPresenters = new Map();
 
   #tripSort = null;
-  #suggestionMessage = new createSuggestionMessage();
-  #eventsList = new createEventsList();
+  #suggestionMessage = new CreateSuggestionMessage();
+  #eventsList = new CreateEventsList();
   #newEvent = null;
   #loadScreen = null;
   #loadErrorScreen = null;
@@ -91,7 +91,7 @@ export default class TripPresenter{
   };
 
   #renderNewEvent = () =>{
-    this.#filterModel.setFilter(UpdateType.MAJOR, filtersTypes.EVERYTHING);
+    this.#filterModel.setFilter(UpdateType.MAJOR, FiltersTypes.EVERYTHING);
     this.#currentSortType = SortType.DATE;
 
     const eventsList = document.querySelector('.trip-events__list');
@@ -103,7 +103,7 @@ export default class TripPresenter{
   };
 
   #renderSort = () =>{
-    this.#tripSort = new createTripSort({
+    this.#tripSort = new CreateTripSort({
       currentSortType: this.#currentSortType,
       handleSortTypeChange: this.#handleSortTypeChange
     });
@@ -194,22 +194,22 @@ export default class TripPresenter{
   };
 
   #renderLoad() {
-    this.#loadScreen = new createLoadMessage();
+    this.#loadScreen = new CreateLoadMessage();
     render(this.#loadScreen, this.#eventsContainer, RenderPosition.AFTERBEGIN);
   }
 
   #renderLoadError(){
-    this.#loadErrorScreen = new createLoadErrorMessage();
+    this.#loadErrorScreen = new CreateLoadErrorMessage();
     render(this.#loadErrorScreen, this.#eventsContainer, RenderPosition.AFTERBEGIN);
   }
 
   #renderBoard = () => {
-    const pointsArr = this.points;
+    const points = this.points;
 
     const filtersArray = document.querySelectorAll('.trip-filters__filter-input');
     const loadScreen = document.querySelector('.trip-events__msg');
 
-    if (pointsArr.length === 0){
+    if (points.length === 0){
       if (!loadScreen){
         render(this.#suggestionMessage, this.#eventsContainer);
       }
@@ -228,8 +228,8 @@ export default class TripPresenter{
 
     newEventButton.addEventListener('click', this.#renderNewEvent);
 
-    for (let i = 0; i < pointsArr.length; i++){
-      this.#renderEvent(pointsArr[i], this.offers, this.destinations);
+    for (let i = 0; i < points.length; i++){
+      this.#renderEvent(points[i], this.offers, this.destinations);
     }
   };
 
@@ -242,6 +242,7 @@ export default class TripPresenter{
     remove(this.#tripSort);
     remove(this.#suggestionMessage);
 
+    newEventButton.removeEventListener('click', this.#renderNewEvent);
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
   };

@@ -1,17 +1,3 @@
-const types = [
-  'taxi',
-  'bus',
-  'train',
-  'ship',
-  'drive',
-  'flight',
-  'check-in',
-  'sightseeing',
-  'restaurant'
-];
-
-const cities = ['Amsterdam', 'Chamonix', 'Geneva'];
-
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
@@ -38,4 +24,4 @@ const MethodType = {
   DELETE: 'DELETE',
 };
 
-export {types, cities, UpdateType, SortType, UserActionType, MethodType};
+export {UpdateType, SortType, UserActionType, MethodType};

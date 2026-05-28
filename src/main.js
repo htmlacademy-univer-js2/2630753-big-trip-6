@@ -1,5 +1,5 @@
 import TripPresenter from './presenter/presenter.js';
-import createTripMainInfo from './view/trip-main-info-view.js';
+import CreateTripMainInfo from './view/trip-main-info-view.js';
 import { render, RenderPosition } from './framework/render.js';
 import PointsModel from './model/points-model.js';
 import FilterModel from './model/filter-model.js';
@@ -20,7 +20,7 @@ const filterModel = new FilterModel();
 const tripPresenter = new TripPresenter(tripEvents, pointsModel, filterModel);
 const filterPresenter = new FilterPresenter({filterContainer: tripControlsFilters, filterModel, pointsModel});
 
-render(new createTripMainInfo(), tripMain, RenderPosition.AFTERBEGIN);
+render(new CreateTripMainInfo(), tripMain, RenderPosition.AFTERBEGIN);
 
 filterPresenter.init();
 tripPresenter.init();
