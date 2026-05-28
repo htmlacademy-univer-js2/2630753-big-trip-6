@@ -6,7 +6,7 @@ function eventsListTemplate(){
         </ul>`;
 }
 
-export default class createEventsList extends AbstractStatefulView{
+export default class CreateEventsList extends AbstractStatefulView{
   get template(){
     return eventsListTemplate();
   }

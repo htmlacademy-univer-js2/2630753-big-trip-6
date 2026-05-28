@@ -31,7 +31,7 @@ function tripSortTemplate(currentSortType){
           </form>`;
 }
 
-export default class createTripSort extends AbstractStatefulView{
+export default class CreateTripSort extends AbstractStatefulView{
   #handleSortTypeChange = null;
   #currentSortType = null;
 

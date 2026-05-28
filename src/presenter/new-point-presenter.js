@@ -1,5 +1,5 @@
 import {remove, render, RenderPosition} from '../framework/render.js';
-import createNewEvent from '../view/event-new-view.js';
+import CreateNewEvent from '../view/event-new-view.js';
 import {nanoid} from 'nanoid';
 import { UpdateType, UserActionType } from '../const.js';
 
@@ -25,7 +25,7 @@ export default class NewPointPresenter {
       return;
     }
 
-    this.#pointEditItem = new createNewEvent({
+    this.#pointEditItem = new CreateNewEvent({
       offers: this.#offers,
       destinations: this.#destinations,
       onFormSubmit: this.#handleFormSubmit,

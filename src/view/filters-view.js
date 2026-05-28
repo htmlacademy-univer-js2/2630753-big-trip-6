@@ -26,7 +26,7 @@ function filtersTemplate(filterItems, currentFilterType){
           </form>`;
 }
 
-export default class createFilters extends AbstractStatefulView{
+export default class CreateFilters extends AbstractStatefulView{
   #filters = null;
   #currentFilterType = null;
   #onFilterTypeChange = null;

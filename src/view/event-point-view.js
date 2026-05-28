@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import he from 'he';
 import { UserActionType, UpdateType } from '../const.js';
 
-function offersTemplate(offerElements){
+function getOffersTemplate(offerElements){
 
   return offerElements.map((offer) => `
                   <li class="event__offer">
@@ -14,7 +14,7 @@ function offersTemplate(offerElements){
                   </li>`).join('');
 }
 
-function eventTemplate(event, offersArr, destinationsArr){
+function getEventTemplate(event, offersArr, destinationsArr){
   const {dateFrom, dateTo, type, basePrice, isFavorite} = event;
   const humanizeDate = humanizeEventDueDate(dateFrom);
   const startTime = dayjs(dateFrom).format('HH:mm');
@@ -47,7 +47,7 @@ function eventTemplate(event, offersArr, destinationsArr){
                 </p>
                 <h4 class="visually-hidden">Offers:</h4>
                 <ul class="event__selected-offers">
-                  ${offersTemplate(offerElements)}
+                  ${getOffersTemplate(offerElements)}
                 </ul>
                 <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
                   <span class="visually-hidden">Add to favorite</span>
@@ -62,7 +62,7 @@ function eventTemplate(event, offersArr, destinationsArr){
             </li>`;
 }
 
-export default class createEvent extends AbstractStatefulView{
+export default class CreateEvent extends AbstractStatefulView{
   #event = null;
   #offers = null;
   #destinations = null;
@@ -92,7 +92,7 @@ export default class createEvent extends AbstractStatefulView{
   }
 
   get template(){
-    return eventTemplate(this.#event, this.#offers, this.#destinations);
+    return getEventTemplate(this.#event, this.#offers, this.#destinations);
   }
 
   #onChangeFavourite = () =>{

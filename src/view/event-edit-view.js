@@ -4,12 +4,12 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-function photosTemplate(destinationData){
+function getPhotosTemplate(destinationData){
   return destinationData.pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}">`).join('');
 
 }
 
-function offersTemplate(offerElements, event){
+function getOffersTemplate(offerElements, event){
   return offerElements.map((offer, idx) => `
     <div class="event__offer-selector">
       <input class="event__offer-checkbox visually-hidden" id="event-offer-${idx}" type="checkbox" name="event-offer-${idx}" ${event.offers.includes(offer.id) ? 'checked' : ''}>
@@ -21,7 +21,7 @@ function offersTemplate(offerElements, event){
     </div>`).join('');
 }
 
-function eventEditTemplate(event, offersArr, destinationsArr){
+function getEventEditTemplate(event, offersArr, destinationsArr){
   const {type, basePrice, dateFrom, dateTo, isSaving, isDeleting, isDisabled} = event;
 
   const offerElements = offersArr[type].filter((offer) => event.offers.some((e) => e === offer.id));
@@ -133,7 +133,7 @@ function eventEditTemplate(event, offersArr, destinationsArr){
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                     <div class="event__available-offers">
-                      ${offerElements ? offersTemplate(offersArr[type], event) : ''}
+                      ${offerElements ? getOffersTemplate(offersArr[type], event) : ''}
                     </div>
                   </section>
 
@@ -143,7 +143,7 @@ function eventEditTemplate(event, offersArr, destinationsArr){
 
                     <div class="event__photos-container">
                       <div class="event__photos-tape">
-                        ${destinationData ? photosTemplate(destinationData) : ''}
+                        ${destinationData ? getPhotosTemplate(destinationData) : ''}
                       </div>
                     </div>
                   </section>
@@ -152,7 +152,7 @@ function eventEditTemplate(event, offersArr, destinationsArr){
 }
 
 
-export default class createEventEdit extends AbstractStatefulView{
+export default class CreateEventEdit extends AbstractStatefulView{
   #event = null;
   #offers = null;
   #destinations = null;
@@ -167,7 +167,7 @@ export default class createEventEdit extends AbstractStatefulView{
     this.#event = event;
     this.#offers = offers;
     this.#destinations = destinations;
-    this._setState(createEventEdit.parseEventToState(event));
+    this._setState(CreateEventEdit .parseEventToState(event));
 
     this.#handleFormSubmit = onFormSubmit;
     this.#handleDeleteClick = onDeleteClick;
@@ -207,12 +207,12 @@ export default class createEventEdit extends AbstractStatefulView{
   }
 
   get template(){
-    return eventEditTemplate(this._state, this.#offers, this.#destinations);
+    return getEventEditTemplate(this._state, this.#offers, this.#destinations);
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(createEventEdit.parseStateToEvent(this._state));
+    this.#handleFormSubmit(CreateEventEdit .parseStateToEvent(this._state));
   };
 
   #onDeleteClickHandler = (evt) => {
