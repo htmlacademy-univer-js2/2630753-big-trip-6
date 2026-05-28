@@ -1,6 +1,6 @@
-import { filtersTypes, filter } from '../filters-const';
+import { FiltersTypes, filter } from '../filters-const';
 import { remove, render, replace } from '../framework/render';
-import createFilters from '../view/filters-view';
+import CreateFilters from '../view/filters-view';
 import { UpdateType } from '../const';
 
 export default class FilterPresenter{
@@ -19,7 +19,7 @@ export default class FilterPresenter{
 
   get filters() {
     const points = this.#pointsModel.points;
-    return Object.values(filtersTypes).map((type) => ({
+    return Object.values(FiltersTypes).map((type) => ({
       type,
       points: filter[type](points)
     }));
@@ -29,7 +29,7 @@ export default class FilterPresenter{
     const filters = this.filters;
     const prevFilterItem = this.#filterItem;
 
-    this.#filterItem = new createFilters({
+    this.#filterItem = new CreateFilters({
       filters,
       currentFilterType: this.#filterModel.filter,
       onFilterTypeChange: this.#handleFilterTypeChange

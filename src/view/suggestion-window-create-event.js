@@ -26,7 +26,7 @@ function getTemplate(){
         `;
 }
 
-export default class createSuggestionMessage extends AbstractStatefulView{
+export default class CreateSuggestionMessage extends AbstractStatefulView{
   get template(){
     return getTemplate();
   }

@@ -1,5 +1,5 @@
-import createEvent from '../view/event-point-view';
-import createEventEdit from '../view/event-edit-view.js';
+import CreateEvent from '../view/event-point-view';
+import CreateEventEdit from '../view/event-edit-view.js';
 import {render, replace, remove} from '../framework/render.js';
 import { UserActionType, UpdateType } from '../const.js';
 
@@ -33,7 +33,7 @@ export default class PointPresenter {
     const previosEventItem = this.#eventItem;
     const previosEventEditItem = this.#eventEditItem;
 
-    this.#eventItem = new createEvent({
+    this.#eventItem = new CreateEvent({
       event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
@@ -43,7 +43,7 @@ export default class PointPresenter {
       handleDataChange: this.#dataChangeHandler
     });
 
-    this.#eventEditItem = new createEventEdit({
+    this.#eventEditItem = new CreateEventEdit ({
       event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
