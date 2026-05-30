@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-function filtersItemTemplate(filter, isChecked){
+function getFiltersItemTemplate(filter, isChecked){
   const {type} = filter;
 
   return `
@@ -16,9 +16,9 @@ function filtersItemTemplate(filter, isChecked){
               `;
 }
 
-function filtersTemplate(filterItems, currentFilterType){
+function getFiltersTemplate(filterItems, currentFilterType){
   const filterItemsTemplate = filterItems
-    .map((filter) => filtersItemTemplate(filter, filter.type === currentFilterType))
+    .map((filter) => getFiltersItemTemplate(filter, filter.type === currentFilterType))
     .join('');
 
   return `<form class="trip-filters" action="#" method="get">
@@ -46,6 +46,6 @@ export default class CreateFilters extends AbstractStatefulView{
   };
 
   get template(){
-    return filtersTemplate(this.#filters, this.#currentFilterType);
+    return getFiltersTemplate(this.#filters, this.#currentFilterType);
   }
 }

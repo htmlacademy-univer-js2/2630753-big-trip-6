@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-function tripMainInfoTemplate(){
+function getTripMainInfoTemplate(){
   return `          <section class="trip-main__trip-info  trip-info">
             <div class="trip-info__main">
               <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
@@ -16,6 +16,6 @@ function tripMainInfoTemplate(){
 
 export default class CreateTripMainInfo extends AbstractStatefulView{
   get template(){
-    return tripMainInfoTemplate();
+    return getTripMainInfoTemplate();
   }
 }
