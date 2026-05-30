@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-function tripSortTemplate(currentSortType){
+function getTripSortTemplate(currentSortType){
 
 
   return `          <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -49,6 +49,6 @@ export default class CreateTripSort extends AbstractStatefulView{
   };
 
   get template(){
-    return tripSortTemplate(this.#currentSortType);
+    return getTripSortTemplate(this.#currentSortType);
   }
 }

@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-function eventsListTemplate(){
+function getEventsListTemplate(){
   return `<ul class="trip-events__list">
   
         </ul>`;
@@ -8,6 +8,6 @@ function eventsListTemplate(){
 
 export default class CreateEventsList extends AbstractStatefulView{
   get template(){
-    return eventsListTemplate();
+    return getEventsListTemplate();
   }
 }

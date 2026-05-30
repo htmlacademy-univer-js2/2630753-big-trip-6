@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-function getTemplate(){
+function getSuggestionMessageTemplate(){
   let text;
 
   if(document.getElementById('filter-everything').checked){
@@ -28,6 +28,6 @@ function getTemplate(){
 
 export default class CreateSuggestionMessage extends AbstractStatefulView{
   get template(){
-    return getTemplate();
+    return getSuggestionMessageTemplate();
   }
 }
